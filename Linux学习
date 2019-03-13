@@ -1,0 +1,362 @@
+在Linux中，任何设备都是文件，不仅如此，连数据通信的接口也有专门的文件负责。可以说，一切皆文件，目录也是一种文件，是路径映射。因此，文件系统是Linux的基础。
+
+一、文件与目录管理命令
+
+1、ls(list)--查看文件与目录命令
+
+　　在linux中，该命令可能是最多被执行的，因为我们随时要知道文件或者目录的相关信息。ls命令默认显示非隐藏文件的文件名（以文件名进行排序）以及文件名代表的颜色。
+
+命令格式：ls [选项] [目录名]
+
+常用参数：
+
+　　-l(long):列出长字符串，包含文件的属性与权限等数据。
+
+　　-a(all):列出所有文件，包含隐藏文件
+
+　　-d(directory):仅列出所指定目录本身，而不列出目录内的文件数据
+
+　　-R(Recursive):连同子目录内容一起列出来，等于该目录下所有文件都会显示出来
+
+　　-h(human-readable):将文件容量以人类易读的方式（GB，KB）列出来
+
+2、cp(copy)--文件或者目录复制命令
+
+命令格式：cp [options] source1 source2 source3...directory——多个文件拷贝到一个目录
+
+　　或者：cp [options] <source file or directory> <target file or directory>——单个文件或目录的拷贝
+
+　　如果是多个文件拷贝到一个目录下，则该目录必须存在。如果某个文件拷贝到某个目录下，则会保持原来的名字
+
+1 cp /etc/passwd /tmp
+　　也可以重命名，如
+
+1 cp /etc/passwd /tmp/test_passwd
+　　则会重新命名为test_passwd,如果test_passwd文件已经存在，则会默认覆盖该文件。
+
+　　cp这个命令，不同身份者执行这个命令会有不同的结果产生，尤其是-a -p参数。
+
+常用参数：
+
+　　-i(interactive):若目标文件已经存在，则会在覆盖时询问
+
+　　-r(recursive):复制目录及目录下所有文件
+
+　　-l(link):进行硬链接的连接文件创建，而非复制文件本身
+
+　　-s(symbolic link):复制为符号链接文件，即快捷方式文件
+
+1 cp ~/.bashrc /tmp/bashrc
+2 cp -l  /tmp/bashrc /tmp/bashrc_hlink
+3 cp -s /tmp/bashrc /tmp/bashrc_slink
+ 　　-p(preserve):连同文件属性一块复制过去，而非使用默认属性
+
+　　在cp命令不加-p参数时候，源文件与目标文件的权限是不同的，目的文件的所有者通常会是命令操作者本身。而且时间戳等也会改变。因此用于备份时候，可以用-p参数，完整复制文件权限的参数。
+
+3、rm(remove)——移除文件或者目录
+
+命令格式：rm [-fir]文件或者目录
+
+　　该命令也可以用于对文件或者目录重命名。如下面将目录mvtest重命名为mvtest1,当然也可以使用rename命令
+
+hao@hao:/tmp$ mv mvtest mvtest1
+常用参数：
+
+　　-f（force）:忽略不存在的文件，不会出现警告信息。
+
+　　-i(interactive):互动模式，在删除前会询问用户是否操作
+
+　　-r(recursive):递归删除目录及目录下所有文件。
+
+4、mv(move)——移动文件与目录、或者更名
+
+命令格式：mv [options] source1 source2 source3...director
+
+命令参数：
+
+　　-f(force):强制的意思，如果目标文件已经存在不会询问直接覆盖
+
+　　-i(interactive):互动模式，在目标文件已经存在时，询问是否覆盖
+
+　　-u（update）:若目标文件已经存在，且source比较新，才会更新
+
+复制代码
+ 1 hao@hao:/$ cd /tmp
+ 2 hao@hao:/tmp$ cp ~/.bashrc bashrc
+ 3 hao@hao:/tmp$ mkdir mvtest
+ 4 hao@hao:/tmp$ mv bashrc mvtest
+ 5 hao@hao:/tmp$ ll /tmp
+ 6 total 36
+ 7 drwxrwxrwt  8 root    root    4096 Jul 24 16:54 ./
+ 8 drwxr-xr-x 23 root    root    4096 Jul 21 20:45 ../
+ 9 drwxrwxrwt  2 root    root    4096 Jul 24 16:20 .ICE-unix/
+10 -r--r--r--  1 root    root      11 Jul 24 16:20 .X0-lock
+11 drwxrwxrwt  2 root    root    4096 Jul 24 16:20 .X11-unix/
+12 drwxrwxrwt  2 lightdm lightdm 4096 Jul 24 16:20 at-spi2/
+13 drwxrwxr-x  2 hao     hao     4096 Jul 24 16:54 mvtest/
+14 drwx------  2 lightdm lightdm 4096 Jul 24 16:20 pulse-2L9K88eMlGn7/
+15 drwx------  2 root    root    4096 Jul 24 16:20 pulse-PKdhtXMmr18n/
+16 -rw-rw-r--  1 lightdm lightdm    0 Jul 24 16:20 unity_support_test.0
+17 hao@hao:/tmp$ ll /tmp/mvtest
+18 total 12
+19 drwxrwxr-x 2 hao  hao  4096 Jul 24 16:54 ./
+20 drwxrwxrwt 8 root root 4096 Jul 24 16:54 ../
+21 -rw-r--r-- 1 hao  hao  3486 Jul 24 16:53 bashrc
+22 hao@hao:/tmp$ mv mvtest mvtest1
+23 hao@hao:/tmp$ ll /tmp
+24 total 36
+25 drwxrwxrwt  8 root    root    4096 Jul 24 16:55 ./
+26 drwxr-xr-x 23 root    root    4096 Jul 21 20:45 ../
+27 drwxrwxrwt  2 root    root    4096 Jul 24 16:20 .ICE-unix/
+28 -r--r--r--  1 root    root      11 Jul 24 16:20 .X0-lock
+29 drwxrwxrwt  2 root    root    4096 Jul 24 16:20 .X11-unix/
+30 drwxrwxrwt  2 lightdm lightdm 4096 Jul 24 16:20 at-spi2/
+31 drwxrwxr-x  2 hao     hao     4096 Jul 24 16:54 mvtest1/
+32 drwx------  2 lightdm lightdm 4096 Jul 24 16:20 pulse-2L9K88eMlGn7/
+33 drwx------  2 root    root    4096 Jul 24 16:20 pulse-PKdhtXMmr18n/
+34 -rw-rw-r--  1 lightdm lightdm    0 Jul 24 16:20 unity_support_test.0
+35 hao@hao:/tmp$ cp ~/.bashrc bashrc1
+36 hao@hao:/tmp$ cp ~/.bashrc bashrc2
+37 hao@hao:/tmp$ mv bashrc1 bashrc2  mvtest1
+38 hao@hao:/tmp$ ll /tmp/mvtest1
+39 total 20
+40 drwxrwxr-x 2 hao  hao  4096 Jul 24 16:58 ./
+41 drwxrwxrwt 8 root root 4096 Jul 24 16:58 ../
+42 -rw-r--r-- 1 hao  hao  3486 Jul 24 16:53 bashrc
+43 -rw-r--r-- 1 hao  hao  3486 Jul 24 16:58 bashrc1
+44 -rw-r--r-- 1 hao  hao  3486 Jul 24 16:58 bashrc2
+复制代码
+ 二、文件内容及属性查阅
+
+1、cat(concatenate)——文件内容查看命令
+
+　　cat命令可以同时查看多个文件内容。cat命令是由第一行到最后一行连续显示在屏幕上，还有一个命令tac是将文件内容由最后一行到第一行反向在屏幕上显示出来。当文件内容过多时候，可以配合more或者less命令来执行较好。也可以配合shift+PageUp或者PageDown键使用。
+
+命令格式：cat [options] [file]...
+
+命令参数：
+
+　　-b(number-nonblank):列出行号，仅对非空白行做出行号显示
+
+　　-n(number):列出行号，对空白行也作出行号显示
+
+　　-E(show-ends):显示文本行结束符号'$'，不同于windows的'^M$'
+
+　　-T(show-tabs):将[Tab]键以^I显示出来
+
+　　-v(show-nonprinting):列出一些看不出来的特殊符号
+
+复制代码
+ 1 hao@hao:/tmp$ cat -n -E -T /etc/issue /etc/fstab
+ 2      1    Ubuntu 12.04.1 LTS \n \l$
+ 3      2    $
+ 4      3    # /etc/fstab: static file system information.$
+ 5      4    #$
+ 6      5    # Use 'blkid' to print the universally unique identifier for a$
+ 7      6    # device; this may be used with UUID= as a more robust way to name devices$
+ 8      7    # that works even if disks are added and removed. See fstab(5).$
+ 9      8    #$
+10      9    # <file system> <mount point>   <type>  <options>       <dump>  <pass>$
+11     10    proc            /proc           proc    nodev,noexec,nosuid 0       0$
+12     11    # / was on /dev/sda1 during installation$
+13     12    UUID=edc98e92-b3a2-44f0-a0e9-079b479d229b /               ext4    errors=remount-ro 0       1$
+14     13    # swap was on /dev/sda5 during installation$
+15     14    UUID=8f9d467f-8359-421d-96cc-156b9e4310e5 none            swap    sw              0       0$
+16     15    /dev/fd0        /media/floppy0  auto    rw,user,noauto,exec,utf8 0       0$
+复制代码
+　　cat命令还可以用'cat file1 file2 >> file'来将几个文件追加到另一个文件的末尾，或者用'cat file1 > file2'用来覆盖文件。或者用'cat > file'从磁盘来创建文件（在输入有错时候可以用ctrl+backspace删除，最后按ctrl+d保存）
+
+复制代码
+ 1 hao@hao:/tmp$ cat fstab
+ 2 # /etc/fstab: static file system information.
+ 3 #
+ 4 # Use 'blkid' to print the universally unique identifier for a
+ 5 # device; this may be used with UUID= as a more robust way to name devices
+ 6 # that works even if disks are added and removed. See fstab(5).
+ 7 #
+ 8 # <file system> <mount point>   <type>  <options>       <dump>  <pass>
+ 9 proc            /proc           proc    nodev,noexec,nosuid 0       0
+10 # / was on /dev/sda1 during installation
+11 UUID=edc98e92-b3a2-44f0-a0e9-079b479d229b /               ext4    errors=remount-ro 0       1
+12 # swap was on /dev/sda5 during installation
+13 UUID=8f9d467f-8359-421d-96cc-156b9e4310e5 none            swap    sw              0       0
+14 /dev/fd0        /media/floppy0  auto    rw,user,noauto,exec,utf8 0       0
+15 Ubuntu 12.04.1 LTS \n \l
+16 
+17 hao@hao:/tmp$ cat issue
+18 Ubuntu 12.04.1 LTS \n \l
+19 
+20 hao@hao:/tmp$ cat issue > fstab
+21 hao@hao:/tmp$ cat fstab
+22 Ubuntu 12.04.1 LTS \n \l
+23 
+24 hao@hao:/tmp$ cat issue
+25 Ubuntu 12.04.1 LTS \n \l
+26 
+27 hao@hao:/tmp$ cp /etc/fstab  /tmp
+28 hao@hao:/tmp$ cat /tmp/issue >>/tmp/fstab
+29 hao@hao:/tmp$ cat issue
+30 Ubuntu 12.04.1 LTS \n \l
+31 
+32 hao@hao:/tmp$ cat fstab
+33 # /etc/fstab: static file system information.
+34 #
+35 # Use 'blkid' to print the universally unique identifier for a
+36 # device; this may be used with UUID= as a more robust way to name devices
+37 # that works even if disks are added and removed. See fstab(5).
+38 #
+39 # <file system> <mount point>   <type>  <options>       <dump>  <pass>
+40 proc            /proc           proc    nodev,noexec,nosuid 0       0
+41 # / was on /dev/sda1 during installation
+42 UUID=edc98e92-b3a2-44f0-a0e9-079b479d229b /               ext4    errors=remount-ro 0       1
+43 # swap was on /dev/sda5 during installation
+44 UUID=8f9d467f-8359-421d-96cc-156b9e4310e5 none            swap    sw              0       0
+45 /dev/fd0        /media/floppy0  auto    rw,user,noauto,exec,utf8 0       0
+46 Ubuntu 12.04.1 LTS \n \l
+47 
+48 hao@hao:/tmp$ cat >test.txt
+49 this is a test file                         
+50 hao@hao:/tmp$ cat test.txt
+51 this is a test file
+复制代码
+2、more——一页一页翻动
+
+命令格式：more[options]file 或 more [-dlfpcsu] [-num] [+/pattern] [+linenum] [fileNames..]
+
+命令参数： 
+
+常用功能键：
+
+　　Enter    向下n行，需要定义。默认为1行
+
+　　Ctrl+F   向下滚动一屏
+
+　　空格键  向下滚动一屏
+
+　　b或Ctrl+b  返回上一屏
+
+　　/字符串 向下查询“字符串”关键字
+
+　　=       输出当前行的行号
+
+　　:f     输出文件名和当前行的行号
+
+　　V      调用vi编辑器
+
+　　!命令   调用Shell，并执行命令 
+
+　　q       退出more
+
+　　less命令可以使用上下等按键功能来往前往后翻看文件，而more没有办法向前翻
+
+3、head——数据选取命令（默认前十行）。
+
+命令格式：head [-n number] file
+
+[hao@hao ~]$ head /etc/man.config
+[hao@hao ~]$ head -n 20 /etc/man.config
+ 4、tail——取出后面几行
+
+命令格式：tail [-n -number] file
+
+[hao@hao ~]$ tail /etc/man.config 
+[hao@hao ~]$ tail -n -20 /etc/man.config 
+如果不知道文件有几行，但是想列出100行以后的数据时
+
+[hao@hao ~]$ tail -n +100 /etc/main.config
+命令参数：
+
+　　-f(follow):即时输出追加到文件末尾的新内容，该参数可以用来监控日志文件等
+
+5、touch——修改文件时间或者创建新文件
+
+文件时间：在linux下，有3个时间参数，用来记录每个文件的主要变动时间。可以用stat命令来查看这三个时间。
+
+a、access time(atime):访问时间。当对文件进行读取时，会改变这个时间。如使用cat.more.less,tail,head,cp等命令。ls命令不会更改该时间
+
+复制代码
+hao@hao ~]$ touch /tmp/tstouch.txt
+[hao@hao ~]$ stat /tmp/tstouch.txt 
+  File: `/tmp/tstouch.txt'
+  Size: 0             Blocks: 0          IO Block: 4096   regular empty file
+Device: 803h/2051d    Inode: 133739      Links: 1
+Access: (0664/-rw-rw-r--)  Uid: (  500/     hao)   Gid: (  500/     hao)
+Access: 2014-08-05 13:39:39.387999895 +0800
+Modify: 2014-08-05 13:39:39.387999895 +0800
+Change: 2014-08-05 13:39:39.387999895 +0800
+[hao@hao ~]$ cat /tmp/tstouch.txt 
+[hao@hao ~]$ stat /tmp/tstouch.txt 
+  File: `/tmp/tstouch.txt'
+  Size: 0             Blocks: 0          IO Block: 4096   regular empty file
+Device: 803h/2051d    Inode: 133739      Links: 1
+Access: (0664/-rw-rw-r--)  Uid: (  500/     hao)   Gid: (  500/     hao)
+Access: 2014-08-05 13:40:12.682999977 +0800
+Modify: 2014-08-05 13:39:39.387999895 +0800
+Change: 2014-08-05 13:39:39.387999895 +0800
+[hao@hao ~]$ ls /tmp/tstouch.txt 
+/tmp/tstouch.txt
+[hao@hao ~]$ stat /tmp/tstouch.txt 
+  File: `/tmp/tstouch.txt'
+  Size: 0             Blocks: 0          IO Block: 4096   regular empty file
+Device: 803h/2051d    Inode: 133739      Links: 1
+Access: (0664/-rw-rw-r--)  Uid: (  500/     hao)   Gid: (  500/     hao)
+Access: 2014-08-05 13:40:12.682999977 +0800
+Modify: 2014-08-05 13:39:39.387999895 +0800
+Change: 2014-08-05 13:39:39.387999895 +0800
+复制代码
+b、modification time(mtime)：修改时间。当文件内容修改时，会改变该时间。如命令vi改变内容时，会改变该时间。使用ll命令默认显示该时间参数
+
+复制代码
+[hao@hao ~]$ vi /tmp/tstouch.txt 
+[hao@hao ~]$ cat /tmp/tstouch.txt 
+hello! world!
+[hao@hao ~]$ stat /tmp/tstouch.txt 
+  File: `/tmp/tstouch.txt'
+  Size: 14            Blocks: 8          IO Block: 4096   regular file
+Device: 803h/2051d    Inode: 133739      Links: 1
+Access: (0664/-rw-rw-r--)  Uid: (  500/     hao)   Gid: (  500/     hao)
+Access: 2014-08-05 13:51:01.097999996 +0800
+Modify: 2014-08-05 13:50:51.630999942 +0800
+Change: 2014-08-05 13:50:51.633999974 +0800
+复制代码
+c、status time(ctime):状态时间。是该文件的i节点最后一次被修改的时间，通过chmod、chown命令修改一次文件属性，这个时间就会更新。
+
+命令格式：touch [options] file
+
+命令参数：
+
+　　-a(access time):仅修改访问时间.
+
+　　-m(modification time):仅改变修改时间。
+
+　　-t(stamp):后面可以接欲修改的时间而不用目前的时间。格式为[YYMMDDhhmm]
+
+复制代码
+[hao@hao ~]$ touch -a /tmp/tstouch.txt
+[hao@hao ~]$ stat /tmp/tstouch.txt 
+  File: `/tmp/tstouch.txt'
+  Size: 14            Blocks: 8          IO Block: 4096   regular file
+Device: 803h/2051d    Inode: 133739      Links: 1
+Access: (0664/-rw-rw-r--)  Uid: (  500/     hao)   Gid: (  500/     hao)
+Access: 2014-08-05 13:56:56.491999787 +0800
+Modify: 2014-08-05 13:50:51.630999942 +0800
+Change: 2014-08-05 13:56:56.491999787 +0800
+[hao@hao ~]$ touch -m /tmp/tstouch.txt
+[hao@hao ~]$ stat /tmp/tstouch.txt 
+  File: `/tmp/tstouch.txt'
+  Size: 14            Blocks: 8          IO Block: 4096   regular file
+Device: 803h/2051d    Inode: 133739      Links: 1
+Access: (0664/-rw-rw-r--)  Uid: (  500/     hao)   Gid: (  500/     hao)
+Access: 2014-08-05 13:56:56.491999787 +0800
+Modify: 2014-08-05 14:06:10.507000067 +0800
+Change: 2014-08-05 14:06:10.507000067 +0800
+[hao@hao ~]$ touch -t 1408050206 /tmp/tstouch.txt
+[hao@hao ~]$ stat /tmp/tstouch.txt 
+  File: `/tmp/tstouch.txt'
+  Size: 14            Blocks: 8          IO Block: 4096   regular file
+Device: 803h/2051d    Inode: 133739      Links: 1
+Access: (0664/-rw-rw-r--)  Uid: (  500/     hao)   Gid: (  500/     hao)
+Access: 2014-08-05 02:06:00.000000000 +0800
+Modify: 2014-08-05 02:06:00.000000000 +0800
+Change: 2014-08-05 14:07:21.688000461 +0800
+复制代码
